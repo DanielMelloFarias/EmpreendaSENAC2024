@@ -1,16 +1,14 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "api/upload.py",
-        "use": "@vercel/python"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "api/upload.py"
-      }
-    ]
-  }
-  
+  "builds": [
+    {
+      "src": "api/upload.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/upload.py"
+    }
+  ]
+}
