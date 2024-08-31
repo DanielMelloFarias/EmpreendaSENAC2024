@@ -58,7 +58,7 @@ async def upload_file(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="Fonte incorreta ou tamanho inferior a 10")
         if not check_page_count(open(file_path, "rb")):
             raise HTTPException(status_code=400, detail="Número de páginas excede o limite de 22")
-
+ 
         cover_text = extract_cover_text(pdf)
         if cover_text:
             return JSONResponse(content={"message": "Arquivo em conformidade", "cover_text": cover_text})
