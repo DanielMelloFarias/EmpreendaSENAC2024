@@ -29,8 +29,13 @@ def check_font_and_size(pdf):
         if text:
             font_data = page.extract_words()
             for word in font_data:
-                if word['fontname'].lower() != 'arial' or int(word['size']) < 10:
-                    return False
+                # Verificar se a chave 'fontname' e 'size' existem no dicionário
+                if 'fontname' in word and 'size' in word:
+                    if word['fontname'].lower() != 'arial' or int(word['size']) < 10:
+                        return False
+                else:
+                    # Se não houver informação de fonte, podemos considerar inválido ou simplesmente continuar
+                    continue
     return True
 
 # Função para contar o número de páginas
