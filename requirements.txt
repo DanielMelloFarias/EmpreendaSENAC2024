@@ -1,0 +1,8 @@
+fastapi
+pydantic
+pillow
+requests
+uvicorn
+google-generativeai
+fastapi-cors
+python-multipart
