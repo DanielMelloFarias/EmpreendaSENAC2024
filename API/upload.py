@@ -47,6 +47,10 @@ def extract_cover_text(file_path):
 
     return None
 
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify({"message": "Oi"}), 200
+
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
