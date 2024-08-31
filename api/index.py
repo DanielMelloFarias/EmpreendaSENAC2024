@@ -1,11 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 import pdfplumber
 import PyPDF2
 import os
 
-
 app = FastAPI()
+
+# Monta a pasta 'static' para servir arquivos estáticos como o index.html
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Função para verificar se a extensão do arquivo é PDF
 def check_extension(file_name):
@@ -43,9 +46,10 @@ def extract_cover_text(pdf):
         return text
     return None
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def read_root():
-    return {"message": "Oi"}
+    with open("static/index.html", "r") as file:
+        return file.read()
 
 @app.post("/api/upload/")
 async def upload_file(file: UploadFile = File(...)):
