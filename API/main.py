@@ -262,7 +262,7 @@ async def verificar_capa(file: UploadFile = File(...)):
 async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
     # Verifica se o arquivo é um PDF
     if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Formato de arquivo não é PDF")
+        raise HTTPException(status_code=400, detail="Formato de arquivo não é PDF ❌")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         file_path = os.path.join(temp_dir, file.filename)
@@ -311,14 +311,15 @@ async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
                     )
                     messages.append(mensagem)
                     # Retorna todas as mensagens em um JSON
-                    return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "details": messages})
+                return JSONResponse(content={"message": "Erros encontrados nas fontes e/ou tamanhos de fonte ❌", "details": messages})
                     
                         
             else:
                 #print(f"{paginas_status} Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
-                print(f"Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
+                print(f"Todas as fontes estão em Arial e o tamanho é 10 ou maior ✔️.")
+                return JSONResponse(content={"message": "Todas as fontes estão em Arial e o tamanho é 10 ou maior. ✔️"})
         except Exception as e:
-            return JSONResponse(content={"message": f"Erro ao tentar verificar as fontes e tamanhos: {e}"})
+            return JSONResponse(content={"message": f"Erro ao tentar verificar as fontes e tamanhos ❌: {e}"})
 
 
 

@@ -317,6 +317,7 @@ async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
             else:
                 #print(f"{paginas_status} Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
                 print(f"Todas as fontes estão em Arial e o tamanho é 10 ou maior ✔️.")
+                return JSONResponse(content={"message": "Todas as fontes estão em Arial e o tamanho é 10 ou maior. ✔️"})
         except Exception as e:
             return JSONResponse(content={"message": f"Erro ao tentar verificar as fontes e tamanhos ❌: {e}"})
 

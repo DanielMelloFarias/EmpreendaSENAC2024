@@ -78,27 +78,27 @@
         <h2>Upload de PDF</h2>
         <input type="file" id="fileInput" class="file-input" accept=".pdf">
         <button id="verificarTudoBtn">Verificar Tudo</button>
-        <div id="loading" class="loading">Verificando...</div>
+        <div id="loadingGlobal" class="loading">Carregando...</div>
     </div>
 
     <div class="container" id="verificacaoPDFContainer">
         <h2>Verificação PDF, Formato A4 e Número de Páginas</h2>
         <button id="verificarPdfA4PaginasBtn">Verificar PDF, A4 e Páginas</button>
-        <div id="loading" class="loading">Verificando...</div>
+        <div id="loadingPdfA4" class="loading">Carregando...</div>
         <pre id="resultPdfA4"></pre>
     </div>
 
     <div class="container" id="verificacaoCapaContainer">
         <h2>Verificar Capa</h2>
         <button id="verificarCapaBtn">Verificar Capa</button>
-        <div id="loading" class="loading">Verificando...</div>
+        <div id="loadingCapa" class="loading">Carregando...</div>
         <pre id="resultCapa"></pre>
     </div>
 
     <div class="container" id="verificacaoFontesContainer">
         <h2>Verificar Fontes e Tamanhos</h2>
         <button id="verificarFontesTamanhosBtn">Verificar Fontes e Tamanhos</button>
-        <div id="loading" class="loading">Verificando...</div>
+        <div id="loadingFontes" class="loading">Carregando...</div>
         <pre id="resultFontes"></pre>
     </div>
 
@@ -109,8 +109,8 @@
             file = event.target.files[0];
         });
 
-        function showLoading(show) {
-            const loadingDiv = document.getElementById('loading');
+        function showLoading(containerId, show) {
+            const loadingDiv = document.getElementById(containerId);
             if (show) {
                 loadingDiv.style.display = 'block';
             } else {
@@ -121,6 +121,11 @@
         function displayResult(containerId, result) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';  // Limpa o conteúdo anterior
+
+            if (result === null || result === undefined || result === '' || (typeof result === 'object' && Object.keys(result).length === 0)) {
+                container.textContent = "Não foi possível obter o resultado.";
+                return;
+            }
 
             if (typeof result === 'string') {
                 container.textContent = result;
@@ -145,13 +150,14 @@
             }
         }
 
-        async function fetchAndDisplayResult(endpoint, containerId) {
+        async function fetchAndDisplayResult(endpoint, resultContainerId, loadingContainerId) {
             if (!file) {
                 alert("Por favor, selecione um arquivo PDF.");
                 return;
             }
 
-            showLoading(true);
+            showLoading('loadingGlobal', true);
+            showLoading(loadingContainerId, true);
             const formData = new FormData();
             formData.append('file', file);
 
@@ -161,24 +167,25 @@
                     body: formData
                 });
                 const result = await response.json();
-                displayResult(containerId, result);
+                displayResult(resultContainerId, result);
             } catch (error) {
-                displayResult(containerId, { error: "Erro ao processar a requisição." });
+                displayResult(resultContainerId, { error: "Erro ao processar a requisição." });
             } finally {
-                showLoading(false);
+                showLoading('loadingGlobal', false);
+                showLoading(loadingContainerId, false);
             }
         }
 
         document.getElementById('verificarPdfA4PaginasBtn').addEventListener('click', function() {
-            fetchAndDisplayResult('/api/verificar_pdf_a4_paginas/', 'resultPdfA4');
+            fetchAndDisplayResult('/api/verificar_pdf_a4_paginas/', 'resultPdfA4', 'loadingPdfA4');
         });
 
         document.getElementById('verificarCapaBtn').addEventListener('click', function() {
-            fetchAndDisplayResult('/api/verificar_capa/', 'resultCapa');
+            fetchAndDisplayResult('/api/verificar_capa/', 'resultCapa', 'loadingCapa');
         });
 
         document.getElementById('verificarFontesTamanhosBtn').addEventListener('click', function() {
-            fetchAndDisplayResult('/api/verificar_fontes_tamanhos/', 'resultFontes');
+            fetchAndDisplayResult('/api/verificar_fontes_tamanhos/', 'resultFontes', 'loadingFontes');
         });
 
         document.getElementById('verificarTudoBtn').addEventListener('click', function() {
