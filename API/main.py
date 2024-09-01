@@ -275,12 +275,35 @@ async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
                 erros += show_ltitem_hierarchy(pagina, page_num=pagina_num)
 
             if erros:
-                return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "errors": erros})
+                # Processa os erros para agrupá-los por palavras
+                palavraCompletaAux = []
+                palavraCompleta = []
+                errors = []
+                
+                for erro in erros:
+                    letra = erro['text']
+                    palavraCompletaAux.append(letra)
+                    if letra == '':
+                        palavraAdicional = ''.join(palavraCompletaAux).strip()
+
+                        errors.append({
+                            'page': erro['page'],
+                            'palavra': palavraAdicional,
+                            'fontname': erro['fontname'],
+                            'size': erro['size'],
+                            'error': erro['error']
+                        })
+                        palavraCompleta.append(palavraAdicional)
+                        palavraCompletaAux.clear()
+
+                return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "errors": errors})
             else:
                 return JSONResponse(content={"message": "Todas as fontes estão em Arial e o tamanho é 10 ou maior ✔️."})
 
         except Exception as e:
             return JSONResponse(content={"message": f"Erro ao tentar verificar as fontes e tamanhos: {e}"})
+
+
 
 
 
