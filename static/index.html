@@ -147,6 +147,7 @@
 
             if (typeof result === 'string') {
                 container.textContent = result;
+                console.log ("aaa:", result)
             } else {
                 for (const key in result) {
                     if (result.hasOwnProperty(key)) {
@@ -185,6 +186,7 @@
                     body: formData
                 });
                 const result = await response.json();
+                console.log (result);
                 displayResult(resultContainerId, result, analysisType);
             } catch (error) {
                 displayResult(resultContainerId, { error: "Erro ao processar a requisição." });

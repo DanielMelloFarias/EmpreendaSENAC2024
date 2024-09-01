@@ -231,7 +231,7 @@ async def verificar_capa(file: UploadFile = File(...)):
                 - Se um campo não estiver claramente identificado, informe que o campo não foi encontrado.
                 - Responda em um formato estruturado, listando cada item como um tópico (checklist) seguido de “Encontrado” ou “Não Encontrado”. Inclua o trecho do texto correspondente, se possível.
                 - Utilize ícones de check (✔️) e uncheck (❌) para indicar a presença ou ausência de cada informação.  
-                - Sempre responda em pt-br
+                - Sempre responda TUDO em pt-br
 
                 Texto extraído:
                 {texto_primeira_pagina}
@@ -316,7 +316,7 @@ async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
                         
             else:
                 #print(f"{paginas_status} Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
-                print(f"Todas as fontes estão em Arial e o tamanho é 10 ou maior ✔️.")
+                #print(f"Todas as fontes estão em Arial e o tamanho é 10 ou maior ✔️.")
                 return JSONResponse(content={"message": "Todas as fontes estão em Arial e o tamanho é 10 ou maior. ✔️"})
         except Exception as e:
             return JSONResponse(content={"message": f"Erro ao tentar verificar as fontes e tamanhos ❌: {e}"})
