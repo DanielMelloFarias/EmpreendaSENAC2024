@@ -41,9 +41,10 @@
             overflow: hidden;
             display: inline-block;
             margin-bottom: 20px;
+            margin-right: 15px;
         }
         .file-input-wrapper button {
-            background-color: #00e676;
+            background-color: #ff6f61;
             color: #121212;
             border: none;
             padding: 10px 20px;
@@ -54,7 +55,7 @@
             display: inline-block;
         }
         .file-input-wrapper button:hover {
-            background-color: #29b6f6;
+            background-color: #ff8a65;
         }
         .file-input-wrapper input[type="file"] {
             font-size: 100px;
@@ -64,6 +65,11 @@
             opacity: 0;
             cursor: pointer;
         }
+        .button-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
         button {
             background-color: #00e676;
             color: #121212;
@@ -72,7 +78,6 @@
             font-size: 1em;
             cursor: pointer;
             border-radius: 5px;
-            margin-right: 10px;
             transition: background-color 0.3s;
         }
         button:hover {
@@ -103,11 +108,13 @@
     
     <div class="container">
         <h2>Upload de PDF</h2>
-        <div class="file-input-wrapper">
-            <button>Escolher Ficheiro</button>
-            <input type="file" id="fileInput" accept=".pdf">
+        <div class="button-wrapper">
+            <div class="file-input-wrapper">
+                <button>Escolher Ficheiro</button>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+            <button id="verificarTudoBtn">Verificar Tudo</button>
         </div>
-        <button id="verificarTudoBtn">Verificar Tudo</button>
         <div id="loadingGlobal" class="loading">Carregando...</div>
     </div>
 
@@ -172,8 +179,8 @@
             } else if (analysisType === "fontes") {
                 const message = result.message || "Não foi possível obter o resultado.";
                 const details = result.details || [];
-                console.log ("Resposta: ", result.message);
-                console.log ("Erros: ", result.details);
+                //console.log ("Resposta: ", result.message);
+                //console.log ("Erros: ", result.details);
 
                 // Combina a mensagem principal com os detalhes em um único objeto
                 result = {

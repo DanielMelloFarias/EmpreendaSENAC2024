@@ -221,7 +221,7 @@ async def verificar_capa(file: UploadFile = File(...)):
                 Incorpore um especialista em verificação de Projetos. Com base no texto fornecido, identifique se estão presentes as seguintes informações:
 
                 1. Título do Projeto: Identifique se há um título que possa ser reconhecido como o nome do projeto.
-                2. Categoria Disputada: Determine se há menção a uma categoria como curso técnico, graduação, pós-graduação, ou outras especificadas posteriormente.
+                2. Categoria Disputada: Determine se há menção a uma categoria como curso técnico, graduação, pós-graduação, Programas, Ensino Médio, ou outras especificadas posteriormente.
                 3. Nome da Equipe: Verifique se há um nome que identifica uma equipe.
                 4. Nomes dos Integrantes ou Nome do Integrante: Identifique se são listados os nomes dos integrantes ou de um integrante específico.
                 5. Cursos que Estão Matriculados: Verifique se há menção aos cursos nos quais os integrantes estão matriculados.
