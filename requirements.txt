@@ -8,3 +8,5 @@ fastapi-cors
 python-multipart
 pdfplumber
 PyPDF2
+pdfminer.six
+groq
