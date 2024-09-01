@@ -142,7 +142,19 @@
             } else if (analysisType === "capa") {
                 result = result.groq_analysis || "Não foi possível obter o resultado.";
             } else if (analysisType === "fontes") {
-                result = result.message || "Não foi possível obter o resultado.";
+                const message = result.message || "Não foi possível obter o resultado.";
+                const details = result.details || [];
+                
+                container.textContent = message;
+
+                details.forEach(item => {
+                    const line = document.createElement('div');
+                    line.className = 'result-line';
+                    line.textContent = item;
+                    container.appendChild(line);
+                });
+
+                return; // Finaliza o displayResult já que o conteúdo foi diretamente manipulado
             }
 
             if (typeof result === 'string') {
