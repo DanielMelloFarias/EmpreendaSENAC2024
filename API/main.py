@@ -8,11 +8,20 @@ app = FastAPI()
 # Monta a pasta 'static' para servir arquivos estáticos como o index.html
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
+async def read_root():
+    with open("static/index.html", "r") as file:
+        return file.read()
+
+@app.get("/teste", response_class=HTMLResponse)
 async def read_root():
     # Carrega o arquivo index.html que estará na pasta 'static'
     with open("static/index.html", "r") as file:
         return file.read()
+    
+@app.get("/testhml")
+async def read_root():
+    return {"message": "OI"}
 
 # Importando os endpoints de cada API
 from verificar_pdf_a4_paginas import verificar_pdf_a4_paginas
