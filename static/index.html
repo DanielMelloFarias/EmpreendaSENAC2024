@@ -60,6 +60,15 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+        .loading {
+            display: none;
+            font-size: 1.2em;
+            color: #ffeb3b;
+            margin-top: 20px;
+        }
+        .result-line {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +78,7 @@
         <h2>Upload de PDF</h2>
         <input type="file" id="fileInput" class="file-input" accept=".pdf">
         <button id="verificarTudoBtn">Verificar Tudo</button>
+        <div id="loading" class="loading">Verificando...</div>
     </div>
 
     <div class="container" id="verificacaoPDFContainer">
@@ -96,49 +106,76 @@
             file = event.target.files[0];
         });
 
-        document.getElementById('verificarPdfA4PaginasBtn').addEventListener('click', async function() {
+        function showLoading(show) {
+            const loadingDiv = document.getElementById('loading');
+            if (show) {
+                loadingDiv.style.display = 'block';
+            } else {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        function displayResult(containerId, result) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';  // Limpa o conteúdo anterior
+
+            if (typeof result === 'string') {
+                container.textContent = result;
+            } else {
+                for (const key in result) {
+                    if (result.hasOwnProperty(key)) {
+                        if (Array.isArray(result[key])) {
+                            result[key].forEach(item => {
+                                const line = document.createElement('div');
+                                line.className = 'result-line';
+                                line.textContent = item;
+                                container.appendChild(line);
+                            });
+                        } else if (typeof result[key] === 'string') {
+                            const line = document.createElement('div');
+                            line.className = 'result-line';
+                            line.textContent = `${key}: ${result[key]}`;
+                            container.appendChild(line);
+                        }
+                    }
+                }
+            }
+        }
+
+        async function fetchAndDisplayResult(endpoint, containerId) {
             if (!file) {
                 alert("Por favor, selecione um arquivo PDF.");
                 return;
             }
+
+            showLoading(true);
             const formData = new FormData();
             formData.append('file', file);
-            const response = await fetch('/api/verificar_pdf_a4_paginas/', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById('resultPdfA4').textContent = JSON.stringify(result, null, 2);
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                displayResult(containerId, result);
+            } catch (error) {
+                displayResult(containerId, { error: "Erro ao processar a requisição." });
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        document.getElementById('verificarPdfA4PaginasBtn').addEventListener('click', function() {
+            fetchAndDisplayResult('/api/verificar_pdf_a4_paginas/', 'resultPdfA4');
         });
 
-        document.getElementById('verificarCapaBtn').addEventListener('click', async function() {
-            if (!file) {
-                alert("Por favor, selecione um arquivo PDF.");
-                return;
-            }
-            const formData = new FormData();
-            formData.append('file', file);
-            const response = await fetch('/api/verificar_capa/', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById('resultCapa').textContent = JSON.stringify(result, null, 2);
+        document.getElementById('verificarCapaBtn').addEventListener('click', function() {
+            fetchAndDisplayResult('/api/verificar_capa/', 'resultCapa');
         });
 
-        document.getElementById('verificarFontesTamanhosBtn').addEventListener('click', async function() {
-            if (!file) {
-                alert("Por favor, selecione um arquivo PDF.");
-                return;
-            }
-            const formData = new FormData();
-            formData.append('file', file);
-            const response = await fetch('/api/verificar_fontes_tamanhos/', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            document.getElementById('resultFontes').textContent = JSON.stringify(result, null, 2);
+        document.getElementById('verificarFontesTamanhosBtn').addEventListener('click', function() {
+            fetchAndDisplayResult('/api/verificar_fontes_tamanhos/', 'resultFontes');
         });
 
         document.getElementById('verificarTudoBtn').addEventListener('click', function() {
