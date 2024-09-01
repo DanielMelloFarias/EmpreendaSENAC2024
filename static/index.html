@@ -128,58 +128,53 @@
         }
 
         function displayResult(containerId, result, analysisType = "") {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';  // Limpa o conteúdo anterior
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';  // Limpa o conteúdo anterior
 
-            if (result === null || result === undefined || result === '' || (typeof result === 'object' && Object.keys(result).length === 0)) {
-                container.textContent = "Não foi possível obter o resultado.";
-                return;
-            }
+        if (result === null || result === undefined || result === '' || (typeof result === 'object' && Object.keys(result).length === 0)) {
+            container.textContent = "Não foi possível obter o resultado.";
+            return;
+        }
 
-            // Tratamento específico para análise de PDF, Capa e Fontes
-            if (analysisType === "pdf") {
-                result = result.message || "Não foi possível obter o resultado.";
-            } else if (analysisType === "capa") {
-                result = result.groq_analysis || "Não foi possível obter o resultado.";
-            } else if (analysisType === "fontes") {
-                const message = result.message || "Não foi possível obter o resultado.";
-                const details = result.details || [];
-                
-                container.textContent = message;
+        // Tratamento específico para análise de PDF, Capa e Fontes
+        if (analysisType === "pdf") {
+            result = result.message || "Não foi possível obter o resultado.";
+        } else if (analysisType === "capa") {
+            result = result.groq_analysis || "Não foi possível obter o resultado.";
+        } else if (analysisType === "fontes") {
+            const message = result.message || "Não foi possível obter o resultado.";
+            const details = result.details || [];
 
-                details.forEach(item => {
-                    const line = document.createElement('div');
-                    line.className = 'result-line';
-                    line.textContent = item;
-                    container.appendChild(line);
-                });
+            // Combina a mensagem principal com os detalhes em um único objeto
+            result = {
+                message: message,
+                details: details
+            };
+        }
 
-                return; // Finaliza o displayResult já que o conteúdo foi diretamente manipulado
-            }
-
-            if (typeof result === 'string') {
-                container.textContent = result;
-                console.log ("aaa:", result)
-            } else {
-                for (const key in result) {
-                    if (result.hasOwnProperty(key)) {
-                        if (Array.isArray(result[key])) {
-                            result[key].forEach(item => {
-                                const line = document.createElement('div');
-                                line.className = 'result-line';
-                                line.textContent = item;
-                                container.appendChild(line);
-                            });
-                        } else if (typeof result[key] === 'string') {
+        // Exibe o resultado final, independentemente do tipo de análise
+        if (typeof result === 'string') {
+            container.textContent = result;
+        } else {
+            for (const key in result) {
+                if (result.hasOwnProperty(key)) {
+                    if (Array.isArray(result[key])) {
+                        result[key].forEach(item => {
                             const line = document.createElement('div');
                             line.className = 'result-line';
-                            line.textContent = `${key}: ${result[key]}`;
+                            line.textContent = item;
                             container.appendChild(line);
-                        }
+                        });
+                    } else if (typeof result[key] === 'string') {
+                        const line = document.createElement('div');
+                        line.className = 'result-line';
+                        line.textContent = `${key}: ${result[key]}`;
+                        container.appendChild(line);
                     }
                 }
             }
         }
+    }
 
         async function fetchAndDisplayResult(endpoint, resultContainerId, loadingContainerId, analysisType = "") {
             if (!file) {
