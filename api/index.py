@@ -311,7 +311,7 @@ async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
                     )
                     messages.append(mensagem)
                     # Retorna todas as mensagens em um JSON
-                    return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "details": messages})
+                return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "details": messages})
                     
                         
             else:
