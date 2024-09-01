@@ -4,120 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificação de PDF</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #00e676;
+            text-shadow: 2px 2px 8px #00e676;
+        }
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #29b6f6;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px #29b6f6;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        .file-input {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #00e676;
+            color: #121212;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #29b6f6;
+        }
+        pre {
+            background-color: #2e2e2e;
+            padding: 15px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
     <h1>Verificação de PDF</h1>
+    
+    <div class="container">
+        <h2>Upload de PDF</h2>
+        <input type="file" id="fileInput" class="file-input" accept=".pdf">
+        <button id="verificarTudoBtn">Verificar Tudo</button>
+    </div>
 
-    <!-- Formulário para verificar se é PDF, A4 e Páginas -->
-    <h2>Verificar PDF, Formato A4 e Número de Páginas</h2>
-    <form id="verificarPdfA4Form">
-        <input type="file" id="fileInputPdfA4" accept=".pdf">
-        <button type="submit">Verificar PDF, A4 e Páginas</button>
-    </form>
-    <div id="resultPdfA4"></div>
+    <div class="container" id="verificacaoPDFContainer">
+        <h2>Verificação PDF, Formato A4 e Número de Páginas</h2>
+        <button id="verificarPdfA4PaginasBtn">Verificar PDF, A4 e Páginas</button>
+        <pre id="resultPdfA4"></pre>
+    </div>
 
-    <!-- Formulário para verificar a capa (Groq) -->
-    <h2>Verificar Capa</h2>
-    <form id="verificarCapaForm">
-        <input type="file" id="fileInputCapa" accept=".pdf">
-        <button type="submit">Verificar Capa</button>
-    </form>
-    <div id="resultCapa"></div>
+    <div class="container" id="verificacaoCapaContainer">
+        <h2>Verificar Capa</h2>
+        <button id="verificarCapaBtn">Verificar Capa</button>
+        <pre id="resultCapa"></pre>
+    </div>
 
-    <!-- Formulário para verificar fontes e tamanhos -->
-    <h2>Verificar Fontes e Tamanhos</h2>
-    <form id="verificarFontesForm">
-        <input type="file" id="fileInputFontes" accept=".pdf">
-        <button type="submit">Verificar Fontes e Tamanhos</button>
-    </form>
-    <div id="resultFontes"></div>
+    <div class="container" id="verificacaoFontesContainer">
+        <h2>Verificar Fontes e Tamanhos</h2>
+        <button id="verificarFontesTamanhosBtn">Verificar Fontes e Tamanhos</button>
+        <pre id="resultFontes"></pre>
+    </div>
 
     <script>
-        // Função para lidar com a submissão do formulário PDF, A4 e Páginas
-        document.getElementById('verificarPdfA4Form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const fileInput = document.getElementById('fileInputPdfA4');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert("Por favor, selecione um arquivo PDF.");
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            try {
-                const response = await fetch('/api/verificar_pdf_a4_paginas/', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                document.getElementById('resultPdfA4').textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                console.error('Erro ao fazer upload:', error);
-                document.getElementById('resultPdfA4').textContent = 'Erro ao fazer upload. Verifique o console para mais detalhes.';
-            }
+        let file = null;
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            file = event.target.files[0];
         });
 
-        // Função para lidar com a submissão do formulário Verificar Capa
-        document.getElementById('verificarCapaForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const fileInput = document.getElementById('fileInputCapa');
-            const file = fileInput.files[0];
-            
+        document.getElementById('verificarPdfA4PaginasBtn').addEventListener('click', async function() {
             if (!file) {
                 alert("Por favor, selecione um arquivo PDF.");
                 return;
             }
-            
             const formData = new FormData();
             formData.append('file', file);
-            
-            try {
-                const response = await fetch('/api/verificar_capa/', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                document.getElementById('resultCapa').textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                console.error('Erro ao fazer upload:', error);
-                document.getElementById('resultCapa').textContent = 'Erro ao fazer upload. Verifique o console para mais detalhes.';
-            }
+            const response = await fetch('/api/verificar_pdf_a4_paginas/', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('resultPdfA4').textContent = JSON.stringify(result, null, 2);
         });
 
-        // Função para lidar com a submissão do formulário Verificar Fontes e Tamanhos
-        document.getElementById('verificarFontesForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            
-            const fileInput = document.getElementById('fileInputFontes');
-            const file = fileInput.files[0];
-            
+        document.getElementById('verificarCapaBtn').addEventListener('click', async function() {
             if (!file) {
                 alert("Por favor, selecione um arquivo PDF.");
                 return;
             }
-            
             const formData = new FormData();
             formData.append('file', file);
-            
-            try {
-                const response = await fetch('/api/verificar_fontes_tamanhos/', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                document.getElementById('resultFontes').textContent = JSON.stringify(result, null, 2);
-            } catch (error) {
-                console.error('Erro ao fazer upload:', error);
-                document.getElementById('resultFontes').textContent = 'Erro ao fazer upload. Verifique o console para mais detalhes.';
+            const response = await fetch('/api/verificar_capa/', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('resultCapa').textContent = JSON.stringify(result, null, 2);
+        });
+
+        document.getElementById('verificarFontesTamanhosBtn').addEventListener('click', async function() {
+            if (!file) {
+                alert("Por favor, selecione um arquivo PDF.");
+                return;
             }
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await fetch('/api/verificar_fontes_tamanhos/', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('resultFontes').textContent = JSON.stringify(result, null, 2);
+        });
+
+        document.getElementById('verificarTudoBtn').addEventListener('click', function() {
+            document.getElementById('verificarPdfA4PaginasBtn').click();
+            setTimeout(() => document.getElementById('verificarCapaBtn').click(), 1000);
+            setTimeout(() => document.getElementById('verificarFontesTamanhosBtn').click(), 2000);
         });
     </script>
 </body>
