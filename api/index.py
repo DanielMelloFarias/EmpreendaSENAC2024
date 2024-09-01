@@ -131,46 +131,30 @@ def verificar_pdf(caminho_arquivo):
         return f"Erro ao tentar ler o PDF: {e}"
 
     try:
+        # Acumula os resultados em uma lista
+        resultados = []
+        
         is_a4, largura, altura = verificar_formato_a4(leitor_pdf)
         if not is_a4:
-            return f"O documento não está no formato A4 ❌. Formato encontrado: {largura} x {altura} pontos."
+            resultados.append(f"O documento não está no formato A4 ❌. Formato encontrado: {largura} x {altura} pontos.")
         else:
-            print("O documento está no formato A4 ✔️.")
+            resultados.append("O documento está no formato A4 ✔️.")
         
         texto_primeira_pagina = extrair_texto_primeira_pagina(caminho_arquivo)
+        if isinstance(texto_primeira_pagina, str):
+            resultados.append(texto_primeira_pagina)
 
         erros = []
         for pagina_num, pagina in enumerate(extract_pages(caminho_arquivo), start=1):
             erros += show_ltitem_hierarchy(pagina, page_num=pagina_num)
 
         if erros:
-            print(f"{paginas_status}\nForam encontrados os seguintes ERROS de: fonte/tamanho ❌:\n")
-            palavraCompletaAux = []
-            palavraCompleta = []
-            errors = []
             for erro in erros:
-                letra = erro['text']
-                palavraCompletaAux.append(letra)
-                if letra == '':
-                    palavraAdicional = ''.join(palavraCompletaAux).strip()
-
-                    errors.append({
-                        'page': erro['page'],
-                        'palavra': palavraAdicional,
-                        'fontname': erro['fontname'],
-                        'size': erro['size'],
-                        'error': erro['error']
-                    })
-                    palavraCompleta.append(palavraAdicional)
-                    palavraCompletaAux.clear()
-
-            for erro in errors:
-                print(f"Página {erro['page']}: Palavra '{erro['palavra']}' - Fonte: {erro['fontname']} - Tamanho: {erro['size']}pt - Erro: {erro['error']}")                    
-                    
+                resultados.append(f"Página {erro['page']}: Palavra '{erro['palavra']}' - Fonte: {erro['fontname']} - Tamanho: {erro['size']}pt - Erro: {erro['error']}")                    
         else:
-            print(f"{paginas_status} Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
+            resultados.append(f"{paginas_status} Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
 
-        return texto_primeira_pagina
+        return "\n".join(resultados)
 
     except Exception as e:
         return f"Erro ao tentar verificar a fonte e o tamanho: {e}"
@@ -191,7 +175,4 @@ async def upload_file(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         resultado = verificar_pdf(file_path)
-        if isinstance(resultado, str):
-            return JSONResponse(content={"message": resultado})
-        else:
-            return JSONResponse(content={"message": "Arquivo em conformidade", "analysis": resultado})
+        return JSONResponse(content={"message": resultado})
