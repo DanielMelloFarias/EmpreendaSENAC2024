@@ -231,7 +231,7 @@ async def verificar_capa(file: UploadFile = File(...)):
                 - Se um campo não estiver claramente identificado, informe que o campo não foi encontrado.
                 - Responda em um formato estruturado, listando cada item como um tópico (checklist) seguido de “Encontrado” ou “Não Encontrado”. Inclua o trecho do texto correspondente, se possível.
                 - Utilize ícones de check (✔️) e uncheck (❌) para indicar a presença ou ausência de cada informação.  
-                - Responda em pt-br
+                - Sempre responda TUDO em pt-br
 
                 Texto extraído:
                 {texto_primeira_pagina}

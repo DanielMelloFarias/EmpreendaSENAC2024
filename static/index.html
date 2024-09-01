@@ -107,7 +107,14 @@
 
         document.getElementById('fileInput').addEventListener('change', function(event) {
             file = event.target.files[0];
+            clearResults();
         });
+
+        function clearResults() {
+            document.getElementById('resultPdfA4').innerHTML = '';
+            document.getElementById('resultCapa').innerHTML = '';
+            document.getElementById('resultFontes').innerHTML = '';
+        }
 
         function showLoading(containerId, show) {
             const loadingDiv = document.getElementById(containerId);
@@ -128,6 +135,7 @@
             }
 
             if (typeof result === 'string') {
+                result = result.replace("message:", "").trim();  // Remove "message:" se presente
                 container.textContent = result;
             } else {
                 for (const key in result) {
@@ -136,13 +144,13 @@
                             result[key].forEach(item => {
                                 const line = document.createElement('div');
                                 line.className = 'result-line';
-                                line.textContent = item;
+                                line.textContent = item.replace("message:", "").trim();  // Remove "message:" se presente
                                 container.appendChild(line);
                             });
                         } else if (typeof result[key] === 'string') {
                             const line = document.createElement('div');
                             line.className = 'result-line';
-                            line.textContent = `${key}: ${result[key]}`;
+                            line.textContent = `${key}: ${result[key].replace("message:", "").trim()}`;
                             container.appendChild(line);
                         }
                     }
@@ -167,6 +175,7 @@
                     body: formData
                 });
                 const result = await response.json();
+                console.log (result);
                 displayResult(resultContainerId, result);
             } catch (error) {
                 displayResult(resultContainerId, { error: "Erro ao processar a requisição." });
