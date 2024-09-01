@@ -59,6 +59,8 @@
             border-radius: 10px;
             white-space: pre-wrap;
             word-wrap: break-word;
+            min-height: 50px; /* Add min-height to ensure the area is visible even when empty */
+            margin-top: 10px;
         }
         .loading {
             display: none;
@@ -85,21 +87,21 @@
         <h2>Verificação PDF, Formato A4 e Número de Páginas</h2>
         <button id="verificarPdfA4PaginasBtn">Verificar PDF, A4 e Páginas</button>
         <div id="loadingPdfA4" class="loading">Carregando...</div>
-        <pre id="resultPdfA4"></pre>
+        <pre id="resultPdfA4">Nenhuma verificação realizada.</pre>
     </div>
 
     <div class="container" id="verificacaoCapaContainer">
         <h2>Verificar Capa</h2>
         <button id="verificarCapaBtn">Verificar Capa</button>
         <div id="loadingCapa" class="loading">Carregando...</div>
-        <pre id="resultCapa"></pre>
+        <pre id="resultCapa">Nenhuma verificação realizada.</pre>
     </div>
 
     <div class="container" id="verificacaoFontesContainer">
         <h2>Verificar Fontes e Tamanhos</h2>
         <button id="verificarFontesTamanhosBtn">Verificar Fontes e Tamanhos</button>
         <div id="loadingFontes" class="loading">Carregando...</div>
-        <pre id="resultFontes"></pre>
+        <pre id="resultFontes">Nenhuma verificação realizada.</pre>
     </div>
 
     <script>
@@ -111,9 +113,9 @@
         });
 
         function clearResults() {
-            document.getElementById('resultPdfA4').innerHTML = '';
-            document.getElementById('resultCapa').innerHTML = '';
-            document.getElementById('resultFontes').innerHTML = '';
+            document.getElementById('resultPdfA4').textContent = 'Nenhuma verificação realizada.';
+            document.getElementById('resultCapa').textContent = 'Nenhuma verificação realizada.';
+            document.getElementById('resultFontes').textContent = 'Nenhuma verificação realizada.';
         }
 
         function showLoading(containerId, show) {
@@ -125,7 +127,7 @@
             }
         }
 
-        function displayResult(containerId, result) {
+        function displayResult(containerId, result, analysisType = "") {
             const container = document.getElementById(containerId);
             container.innerHTML = '';  // Limpa o conteúdo anterior
 
@@ -134,8 +136,16 @@
                 return;
             }
 
+            // Tratamento específico para análise de PDF, Capa e Fontes
+            if (analysisType === "pdf") {
+                result = result.message || "Não foi possível obter o resultado.";
+            } else if (analysisType === "capa") {
+                result = result.groq_analysis || "Não foi possível obter o resultado.";
+            } else if (analysisType === "fontes") {
+                result = result.message || "Não foi possível obter o resultado.";
+            }
+
             if (typeof result === 'string') {
-                result = result.replace("message:", "").trim();  // Remove "message:" se presente
                 container.textContent = result;
             } else {
                 for (const key in result) {
@@ -144,13 +154,13 @@
                             result[key].forEach(item => {
                                 const line = document.createElement('div');
                                 line.className = 'result-line';
-                                line.textContent = item.replace("message:", "").trim();  // Remove "message:" se presente
+                                line.textContent = item;
                                 container.appendChild(line);
                             });
                         } else if (typeof result[key] === 'string') {
                             const line = document.createElement('div');
                             line.className = 'result-line';
-                            line.textContent = `${key}: ${result[key].replace("message:", "").trim()}`;
+                            line.textContent = `${key}: ${result[key]}`;
                             container.appendChild(line);
                         }
                     }
@@ -158,7 +168,7 @@
             }
         }
 
-        async function fetchAndDisplayResult(endpoint, resultContainerId, loadingContainerId) {
+        async function fetchAndDisplayResult(endpoint, resultContainerId, loadingContainerId, analysisType = "") {
             if (!file) {
                 alert("Por favor, selecione um arquivo PDF.");
                 return;
@@ -175,8 +185,7 @@
                     body: formData
                 });
                 const result = await response.json();
-                console.log (result);
-                displayResult(resultContainerId, result);
+                displayResult(resultContainerId, result, analysisType);
             } catch (error) {
                 displayResult(resultContainerId, { error: "Erro ao processar a requisição." });
             } finally {
@@ -186,15 +195,15 @@
         }
 
         document.getElementById('verificarPdfA4PaginasBtn').addEventListener('click', function() {
-            fetchAndDisplayResult('/api/verificar_pdf_a4_paginas/', 'resultPdfA4', 'loadingPdfA4');
+            fetchAndDisplayResult('/api/verificar_pdf_a4_paginas/', 'resultPdfA4', 'loadingPdfA4', 'pdf');
         });
 
         document.getElementById('verificarCapaBtn').addEventListener('click', function() {
-            fetchAndDisplayResult('/api/verificar_capa/', 'resultCapa', 'loadingCapa');
+            fetchAndDisplayResult('/api/verificar_capa/', 'resultCapa', 'loadingCapa', 'capa');
         });
 
         document.getElementById('verificarFontesTamanhosBtn').addEventListener('click', function() {
-            fetchAndDisplayResult('/api/verificar_fontes_tamanhos/', 'resultFontes', 'loadingFontes');
+            fetchAndDisplayResult('/api/verificar_fontes_tamanhos/', 'resultFontes', 'loadingFontes', 'fontes');
         });
 
         document.getElementById('verificarTudoBtn').addEventListener('click', function() {
