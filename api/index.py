@@ -270,17 +270,57 @@ async def verificar_fontes_tamanhos(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         try:
+            # Processamento dos Erros
             erros = []
-            for pagina_num, pagina in enumerate(extract_pages(file_path), start=1):
+            for pagina_num, pagina in enumerate(extract_pages(file_path), start=1):            
                 erros += show_ltitem_hierarchy(pagina, page_num=pagina_num)
 
             if erros:
-                return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "errors": erros})
-            else:
-                return JSONResponse(content={"message": "Todas as fontes estão em Arial e o tamanho é 10 ou maior ✔️."})
+                #print(f"{paginas_status}\nForam encontrados os seguintes ERROS de: fonte/tamanho ❌:\n")
+                palavraCompletaAux = []
+                palavraCompleta = []
+                errors = []
+                messages = []  # Lista para armazenar todas as mensagens
 
+                for erro in erros:
+                    letra = erro['text']
+                    #print (letra)
+                    palavraCompletaAux.append(letra)
+                    if (letra == ''):
+                        palavraAdicional = ''.join(palavraCompletaAux)  # Concatena todos os caracteres em uma string
+                        palavraAdicional = palavraAdicional.strip()  # Remove qualquer espaço vazio ou string vazia no final
+
+                        errors.append({
+                            'page': erro['page'],
+                            'palavra': palavraAdicional,
+                            'fontname': erro['fontname'],
+                            'size': erro['size'],
+                            'error': erro['error']
+                        })
+                        #print (palavraAdicional)
+                        palavraCompleta.append(palavraAdicional)
+                        palavraCompletaAux.clear()
+
+                for erro in errors:
+                    #print(f"Página {erro['page']}: Palavra '{erro['palavra']}' - Fonte: {erro['fontname']} - Tamanho: {erro['size']}pt - Erro: {erro['error']}")
+                    # Gerar as mensagens de erro completas                
+                    mensagem = (
+                        f"Página {erro['page']}: Palavra '{erro['palavra']}' "
+                        f"- Fonte: {erro['fontname']} - Tamanho: {erro['size']}pt "
+                        f"- Erro: {erro['error']}"
+                    )
+                    messages.append(mensagem)
+                    # Retorna todas as mensagens em um JSON
+                    return JSONResponse(content={"message": "Erros encontrados nas fontes e tamanhos", "details": messages})
+                    
+                        
+            else:
+                #print(f"{paginas_status} Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
+                print(f"Todas as fontes estão em Arial e o tamanho é 10 ou maior.")
         except Exception as e:
             return JSONResponse(content={"message": f"Erro ao tentar verificar as fontes e tamanhos: {e}"})
+
+
 
 
 
